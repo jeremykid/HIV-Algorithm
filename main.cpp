@@ -79,6 +79,10 @@ double rotate_240(point A){
 
 // }
 
+bool checkDistance(point A, point B){
+	return distance
+}
+
 int main(){
 	// IOfunction();
 	point p0;
@@ -92,10 +96,14 @@ int main(){
 	cin >> p1.z_index;	
 	rotate_120(p0,p1);
 
-	int K_index;
-	int P_index;
-	// point *K
-	while 
+	int K_index = 2;
+	int P_index = 2;
+	point Karray[2000];
+ 
+	while (K_index != P_index){
+
+
+	}
 
 	return 0;
 }
