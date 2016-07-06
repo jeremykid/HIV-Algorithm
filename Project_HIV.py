@@ -6,14 +6,18 @@ class Point:
 	y = 0
 	z = 0
 	index = 0
-	def __init__(self, x, y, z):
+	def __init__(self, x, y, z, index = 0):
 		self.x = x
 		self.y = y
 		self.z = z
+		self.index = index
 
 	def editIndex(self, index):
 		self.index = index
-		
+
+	def __str__(self):
+		return str(self.x)+" "+str(self.y)+" "+str(self.z)+" "+str(self.index)
+
 class Quaternion:
 	w = 0
 	x = 0
@@ -94,11 +98,43 @@ def readFromCsv():
 
 	return 0
 
+def general_input():
+	with open("in") as f:
+		content = f.read().splitlines()
+		print content
+		kIndex = int(content[0])
+		K_keepers = []
+		for i in range(kIndex):
+			a = content[i+1].split()
+			newpoint = Point(float(a[0]),float(a[1]),float(a[2]),i+1)
+			K_keepers.append(newpoint)
+
+	return 0
+
+def general_write():
+	with open("out","w") as w:
+		w.write(str(123)+"\n")
+		w.write("str"+ "\n")
+
+def get_root_index(index):
+	if index%2:
+		return (index-1)/2
+	else:
+		return (index-2)/2
+
+def check_distance(point_x,point_y):
+	distance = math.sqrt((point_x.x-point_y.x)**2+(point_x.y-point_y.y)**2+(point_x.z-point_y.z)**2)
+	if distance >= 52.0769942809:
+		return True
+	else:
+		return False
+
 def main():
-	point_x = Point(0,0,632.1911456)
-	point_y = Point(52.03280151,0,630.0462143)
-
-
+	general_input()
+	point_x = Point(0,0,632.1911456,1)
+	point_y = Point(52.03280151,0,630.0462143,2)
+	print (point_x)
+	listA = [point_x,point_y]
 
 	rotate120(point_y,point_x)
 	rotate240(point_y,point_x)
