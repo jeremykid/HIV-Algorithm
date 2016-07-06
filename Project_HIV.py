@@ -5,12 +5,15 @@ class Point:
 	x = 0
 	y = 0
 	z = 0
-
+	index = 0
 	def __init__(self, x, y, z):
 		self.x = x
 		self.y = y
 		self.z = z
 
+	def editIndex(self, index):
+		self.index = index
+		
 class Quaternion:
 	w = 0
 	x = 0
@@ -96,7 +99,12 @@ def main():
 	point_y = Point(52.03280151,0,630.0462143)
 
 
+
 	rotate120(point_y,point_x)
 	rotate240(point_y,point_x)
+
+	P_index = 3
+	K_index = 0
+
 	return 0
 main()
