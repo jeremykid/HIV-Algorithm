@@ -190,7 +190,6 @@ def main():
 				K_count += 1
 				a = new_point
 				w.write(str(a))
-				print (a)
 				w.write("\n")
 			else:
 				K_keepers.append(0)
