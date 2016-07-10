@@ -101,19 +101,25 @@ def rotate240(point_x,point_y):
 	result_point = Point(x,y,z)
 	return result_point
 
+'''
 def readFromCsv():
 
 	return 0
+'''
 
 def general_input():
 	with open("in") as f:
 		content = f.read().splitlines()
 		K_index = int(content[0])
 		K_keepers = []
+
+		K_dict = {}
+
 		for i in range(K_index):
 			a = content[i+1].split()
 			new_point = Point(float(a[0]),float(a[1]),float(a[2]),i+1)
 			K_keepers.append(new_point)
+			K_dict[i+1] = new_point
 		P_index = int(content[K_index+1])
 		P_pivots = []
 		for i in range(P_index):
@@ -121,8 +127,8 @@ def general_input():
 			new_point = Point(float(a[0]),float(a[1]),float(a[2]),i+1)
 			P_pivots.append(new_point)
 
-
-	return K_keepers,K_index,P_index,P_pivots
+		K_queue = [2,3,4]
+	return K_dict, K_queue, K_keepers,K_index,P_index,P_pivots
 
 def general_write():
 	with open("out","w") as w:
@@ -138,9 +144,12 @@ def get_root_index(index):
 		return (index-2)/2
 
 def check_distance(point_x,point_y):
+	'''
+	return the distance between point_x and point_y
+	'''
 	distance = math.sqrt((point_x.x-point_y.x)**2+(point_x.y-point_y.y)**2+(point_x.z-point_y.z)**2)
-	# print (distance)
-	if distance >= 52:
+	#print (distance)# 52.076992648 52.0769926525
+	if distance >= 52.07699:
 		return True
 	else:
 		return False
@@ -151,67 +160,80 @@ def check_everydistance(point_x,K_keepers):
 			return False
 	return True
 
-
-
 def main():
-	K_keepers, K_index,P_index,P_pivots = general_input()
+	# R = float(input('Type the R: '))
+	# r = 52.0769942809
 
-	# point_x = Point(0,0,632.1911456,1)
-	# point_y = Point(52.03280151,0,630.0462143,2)
-	# print (point_x)
-	# listA = [point_x,point_y]
+	# cosphi = (2*R**2-r**2)/(2*R**2)
+	# sinphi = math.sqrt(1-cosphi**2)
+	# print (sinphi*R,cosphi*R)
 
-	# print K_keepers, K_index,P_index,P_pivots 
+	# K_dict = {}
+	# K_dict[1] = Point(0,0,R,1)
+	# K_dict[2] = Point(sinphi*R,0,cosphi*R)
+	# K_dict[3] = 
+
+	K_dict, K_queue, K_keepers, K_index,P_count,P_pivots = general_input()
+
 	w = open("out","w")
+	w_plot = open("lines","w")
+
+	for i in K_keepers:
+		w.write(str(i))
+		w.write("\n")
+		w_plot.write(str(K_keepers[0])+" "+str(K_keepers[1])+"\n")
+		w_plot.write(str(K_keepers[0])+" "+str(K_keepers[2])+"\n")
+		w_plot.write(str(K_keepers[0])+" "+str(K_keepers[3])+"\n")
+
 
 	K_count = K_index
 	K_index += 1
-	P_count = P_index
-	while (P_count != K_count):
-		father = get_root_index(K_index)
+	# while (P_count != K_count):
+	while len(K_queue) != 0:
+		# father = get_root_index(K_index)
+		father = K_queue.pop(0)
 		grandfather = get_root_index(father)
-		if K_keepers[father-1]:
-			new_point = rotate120(K_keepers[grandfather-1],K_keepers[father-1])
+
+
+		if K_dict.has_key(father):
+			new_point = rotate120(K_dict[grandfather],K_dict[father])
+			K_index = father*2+1
 			new_point.editIndex(K_index)
 			if check_everydistance(new_point,K_keepers):
 				K_keepers.append(new_point)
+				K_dict[K_index] = new_point
+				K_queue.append(K_index)
 				K_count += 1
 				a = new_point
 				w.write(str(a))
 				print (a)
 				w.write("\n")
-			else:
-				K_keepers.append(0)
-			K_index += 1
-			new_point = rotate240(K_keepers[grandfather-1],K_keepers[father-1])
+				b = K_dict[father]
+				w_plot.write(str(a)+" ")
+				w_plot.write(str(b))
+				w_plot.write("\n")
+			K_index = father*2+2
+			new_point = rotate240(K_dict[grandfather],K_dict[father])
 			new_point.editIndex(K_index)
 			if check_everydistance(new_point,K_keepers):
 				K_keepers.append(new_point)
+				K_dict[K_index] = new_point
+				K_queue.append(K_index)
 				K_count += 1
 				a = new_point
 				w.write(str(a))
 				print (a)
 				w.write("\n")
-			else:
-				K_keepers.append(0)
-			K_index += 1
+				b = K_dict[father]
+				w_plot.write(str(a)+" ")
+				w_plot.write(str(b))
+				w_plot.write("\n")
 
-		else:
-			K_keepers.append(0)
-			K_keepers.append(0)
-			K_index += 2
-
-		if K_keepers[father-1]:
+			P_pivots.append(K_dict[father])
 			P_count += 1
-		P_index += 1
-		P_pivots.append(K_keepers[father-1])
 
-	w.write(P_count,K_count)
+	print (P_count,K_count)
 	# rotate120(point_x,point_y)
 	# rotate240(point_x,point_y)
-
-
-
-
 	return 0
 main()
