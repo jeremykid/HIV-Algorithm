@@ -1,24 +1,22 @@
 import math
 
 class Point:
-	"the points"
+	'''
+	Point which has 4 variables. The cordinations of x,y,z and index for algorithm.
+	'''
 	x = 0
 	y = 0
 	z = 0
 	index = 0
-	# exist = 0
+
 	def __init__(self, x, y, z, index = 0):
 		self.x = x
 		self.y = y
 		self.z = z
 		self.index = index
-		# self.exist = exist
 
 	def editIndex(self, index):
 		self.index = index
-
-	# def editExist(self, exist):
-	# 	self.exist = exist
 
 	def __repr__(self):
 		return str(self.x)+" "+str(self.y)+" "+str(self.z)+" "+str(self.index)
@@ -101,34 +99,28 @@ def rotate240(point_x,point_y):
 	result_point = Point(x,y,z)
 	return result_point
 
-'''
-def readFromCsv():
+# def general_input():
+# 	with open("in") as f:
+# 		content = f.read().splitlines()
+# 		K_index = int(content[0])
+# 		K_keepers = []
 
-	return 0
-'''
+# 		K_dict = {}
 
-def general_input():
-	with open("in") as f:
-		content = f.read().splitlines()
-		K_index = int(content[0])
-		K_keepers = []
+# 		for i in range(K_index):
+# 			a = content[i+1].split()
+# 			new_point = Point(float(a[0]),float(a[1]),float(a[2]),i+1)
+# 			K_keepers.append(new_point)
+# 			K_dict[i+1] = new_point
+# 		P_index = int(content[K_index+1])
+# 		P_pivots = []
+# 		for i in range(P_index):
+# 			a = content[i+K_index].split()
+# 			new_point = Point(float(a[0]),float(a[1]),float(a[2]),i+1)
+# 			P_pivots.append(new_point)
 
-		K_dict = {}
-
-		for i in range(K_index):
-			a = content[i+1].split()
-			new_point = Point(float(a[0]),float(a[1]),float(a[2]),i+1)
-			K_keepers.append(new_point)
-			K_dict[i+1] = new_point
-		P_index = int(content[K_index+1])
-		P_pivots = []
-		for i in range(P_index):
-			a = content[i+K_index].split()
-			new_point = Point(float(a[0]),float(a[1]),float(a[2]),i+1)
-			P_pivots.append(new_point)
-
-		K_queue = [2,3,4]
-	return K_dict, K_queue, K_keepers,K_index,P_index,P_pivots
+# 		K_queue = [2,3,4]
+# 	return K_dict, K_queue, K_keepers,K_index,P_index,P_pivots
 
 def general_write():
 	with open("out","w") as w:
@@ -161,19 +153,26 @@ def check_everydistance(point_x,K_keepers):
 	return True
 
 def main():
-	# R = float(input('Type the R: '))
-	# r = 52.0769942809
+	R = float(input('Type the R: '))
+	r = 52.0769942809
 
-	# cosphi = (2*R**2-r**2)/(2*R**2)
-	# sinphi = math.sqrt(1-cosphi**2)
-	# print (sinphi*R,cosphi*R)
+	cosphi = (2*R**2-r**2)/(2*R**2)
+	sinphi = math.sqrt(1-cosphi**2)
 
-	# K_dict = {}
-	# K_dict[1] = Point(0,0,R,1)
-	# K_dict[2] = Point(sinphi*R,0,cosphi*R)
-	# K_dict[3] = 
+	K_dict = {}
+	K_dict[1] = Point(0,0,R,1)
+	K_dict[2] = Point(sinphi*R,0,cosphi*R)
+	K_dict[2].editIndex(2)
+	K_dict[3] = rotate120(K_dict[2], K_dict[1])
+	K_dict[3].editIndex(3)
+	K_dict[4] = rotate240(K_dict[2], K_dict[1])
+	K_dict[4].editIndex(4)
 
-	K_dict, K_queue, K_keepers, K_index,P_count,P_pivots = general_input()
+	K_queue = [2,3,4]
+	K_keepers = [K_dict[1],K_dict[2],K_dict[3],K_dict[4]]
+	K_index = 4
+	P_count = 1
+	P_pivots = [K_dict[1]]
 
 	w = open("out","w")
 	w_plot = open("lines","w")
@@ -186,14 +185,11 @@ def main():
 		w_plot.write(str(K_keepers[0])+" "+str(K_keepers[3])+"\n")
 
 
-	K_count = K_index
-	K_index += 1
-	# while (P_count != K_count):
+	K_index = 5
+	K_count = 4
 	while len(K_queue) != 0:
-		# father = get_root_index(K_index)
 		father = K_queue.pop(0)
 		grandfather = get_root_index(father)
-
 
 		if K_dict.has_key(father):
 			new_point = rotate120(K_dict[grandfather],K_dict[father])
@@ -204,14 +200,8 @@ def main():
 				K_dict[K_index] = new_point
 				K_queue.append(K_index)
 				K_count += 1
-				a = new_point
-				w.write(str(a))
-				print (a)
-				w.write("\n")
-				b = K_dict[father]
-				w_plot.write(str(a)+" ")
-				w_plot.write(str(b))
-				w_plot.write("\n")
+				w.write(str(new_point)+"\n")
+				w_plot.write(str(new_point)+" "+str(K_dict[father])+"\n")
 			K_index = father*2+2
 			new_point = rotate240(K_dict[grandfather],K_dict[father])
 			new_point.editIndex(K_index)
@@ -220,20 +210,13 @@ def main():
 				K_dict[K_index] = new_point
 				K_queue.append(K_index)
 				K_count += 1
-				a = new_point
-				w.write(str(a))
-				print (a)
-				w.write("\n")
-				b = K_dict[father]
-				w_plot.write(str(a)+" ")
-				w_plot.write(str(b))
-				w_plot.write("\n")
+				w.write(str(new_point)+"\n")
+				w_plot.write(str(new_point)+" "+str(K_dict[father])+"\n")
 
 			P_pivots.append(K_dict[father])
 			P_count += 1
 
 	print (P_count,K_count)
-	# rotate120(point_x,point_y)
-	# rotate240(point_x,point_y)
+
 	return 0
 main()
