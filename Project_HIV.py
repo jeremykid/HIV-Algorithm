@@ -1,4 +1,16 @@
 import math
+import pointsPlot
+import linesPlot
+import time
+
+global T_points_file 
+T_points_file = open("T_points","w")
+global T_y_points_array
+T_y_points_array = []
+global T_points_count
+T_points_count = 0
+global T_x_points_array
+T_x_points_array = []
 
 class Point:
 	'''
@@ -21,21 +33,11 @@ class Point:
 	def __repr__(self):
 		return str(self.x)+" "+str(self.y)+" "+str(self.z)+" "+str(self.index)
 
-class Quaternion:
-	w = 0
-	x = 0
-	y = 0
-	z = 0
-
-	def __init__(self, theta, x, y, z):
-		sintheta = math.sin(theta/2)
-		self.w = math.cos(theta/2)
-		self.x = x*sintheta
-		self.y = y*sintheta
-		self.z = z*sintheta
-
-
 def distance(point_x, point_y): 
+	'''
+	To caculate the distance between point_x and point_y
+	'''
+
 	x2 = (point_x.x-point_y.x)**2
 	y2 = (point_x.y-point_y.y)**2
 	z2 = (point_x.z-point_y.z)**2
@@ -43,8 +45,10 @@ def distance(point_x, point_y):
 	return math.sqrt(x2+y2+z2)
 
 def unit(point_z):
+	'''
+	To caculate the unit vector of point_z
+	'''
 	magnitude = math.sqrt(point_z.x**2 + point_z.y**2 + point_z.z**2)
-	
 	point_z.x = point_z.x/magnitude
 	point_z.y = point_z.y/magnitude
 	point_z.z = point_z.z/magnitude
@@ -99,35 +103,10 @@ def rotate240(point_x,point_y):
 	result_point = Point(x,y,z)
 	return result_point
 
-# def general_input():
-# 	with open("in") as f:
-# 		content = f.read().splitlines()
-# 		K_index = int(content[0])
-# 		K_keepers = []
-
-# 		K_dict = {}
-
-# 		for i in range(K_index):
-# 			a = content[i+1].split()
-# 			new_point = Point(float(a[0]),float(a[1]),float(a[2]),i+1)
-# 			K_keepers.append(new_point)
-# 			K_dict[i+1] = new_point
-# 		P_index = int(content[K_index+1])
-# 		P_pivots = []
-# 		for i in range(P_index):
-# 			a = content[i+K_index].split()
-# 			new_point = Point(float(a[0]),float(a[1]),float(a[2]),i+1)
-# 			P_pivots.append(new_point)
-
-# 		K_queue = [2,3,4]
-# 	return K_dict, K_queue, K_keepers,K_index,P_index,P_pivots
-
-def general_write():
-	with open("out","w") as w:
-		w.write(str(123)+"\n")
-		w.write("str"+ "\n")
-
 def get_root_index(index):
+	'''
+	According to algorithm, the index x is the root of branch 2x+1 and 2x+2
+	'''
 	if index == 2:
 		return 1
 	elif index%2:
@@ -135,24 +114,42 @@ def get_root_index(index):
 	else:
 		return (index-2)/2
 
-def check_distance(point_x,point_y):
+def check_distance(point_x,point_y,check_T_points=0):
 	'''
 	return the distance between point_x and point_y
 	'''
 	distance = math.sqrt((point_x.x-point_y.x)**2+(point_x.y-point_y.y)**2+(point_x.z-point_y.z)**2)
 	#print (distance)# 52.076992648 52.0769926525
 	if distance >= 52.07699:
-		return True
+		if check_T_points:
+			if distance < 53 and (point_y.index-1)//2 != point_x.index:
+				global T_points_file
+				T_points_file.write(str(point_y)+"\n")
+				T_points_file.write(str(point_x)+"\n")
+				global T_y_points_array
+				T_y_points_array.append(point_y)
+				global T_x_points_array
+				T_x_points_array.append(point_x)
+				global T_points_count
+				T_points_count += 1
+		else:
+			return True
 	else:
 		return False
 
 def check_everydistance(point_x,K_keepers):
+	'''
+	check the distances between each points in K_keepers and point_x
+	'''
 	for i in K_keepers:
-		if i and not check_distance(i,point_x):
+		if not check_distance(i,point_x):
 			return False
+	for i in K_keepers:
+		check_distance(i,point_x,check_T_points=1)
 	return True
 
-def main():
+def algorithm():
+	# The IO for researcher to input the R
 	R = float(input('Type the R: '))
 	r = 52.0769942809
 
@@ -170,23 +167,27 @@ def main():
 
 	K_queue = [2,3,4]
 	K_keepers = [K_dict[1],K_dict[2],K_dict[3],K_dict[4]]
-	K_index = 4
-	P_count = 1
-	P_pivots = [K_dict[1]]
+	K_index = 5
+	K_count = 4
 
-	w = open("out","w")
+	# open the file to write, w is write the points' coordinations
+	w = open("points","w")
 	w_plot = open("lines","w")
 
+	# To write the first 4 points' coordination the file "points",
 	for i in K_keepers:
 		w.write(str(i))
 		w.write("\n")
-		w_plot.write(str(K_keepers[0])+" "+str(K_keepers[1])+"\n")
-		w_plot.write(str(K_keepers[0])+" "+str(K_keepers[2])+"\n")
-		w_plot.write(str(K_keepers[0])+" "+str(K_keepers[3])+"\n")
 
+	# To write the first 3 lines 2 ends' points coordinations in the file "lines"
+	w_plot.write(str(K_keepers[0])+" "+str(K_keepers[1])+"\n")
+	w_plot.write(str(K_keepers[0])+" "+str(K_keepers[2])+"\n")
+	w_plot.write(str(K_keepers[0])+" "+str(K_keepers[3])+"\n")
 
-	K_index = 5
-	K_count = 4
+	# Repeat the step which finds the coordinations 
+	# according to the points in the K_queue
+	# and push the new points in the K_queue
+	# Until we use all the points in the K_queue
 	while len(K_queue) != 0:
 		father = K_queue.pop(0)
 		grandfather = get_root_index(father)
@@ -213,10 +214,35 @@ def main():
 				w.write(str(new_point)+"\n")
 				w_plot.write(str(new_point)+" "+str(K_dict[father])+"\n")
 
-			P_pivots.append(K_dict[father])
-			P_count += 1
+	print "There are "+str(K_count)+" points."
+	print "There are "+str(T_points_count)+" T_points."
+	w_plot.close
+	w.close
+	return 0
 
-	print (P_count,K_count)
+def plot():
+	# Ask researcher for showing the model and save the png file.
+	print "1 - show and save the lines plot"
+	print "2 - show and save the points model"
+	print "3 - quit"
+	option = int(input("Input your choice: "))
+	while option < 3:
+		global T_x_points_array
+		global T_y_points_array
+		if option == 2:
+
+			T_x_points_array.extend(T_y_points_array)
+
+			print (T_x_points_array)
+			pointsPlot.drawPoints(T_x_points_array)
+		else:
+
+			linesPlot.drawLines(T_x_points_array,T_y_points_array)
+		option = int(input("Input your choice: "))
 
 	return 0
+
+def main():
+	algorithm()
+	plot()
 main()
